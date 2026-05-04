@@ -23,7 +23,7 @@ public class SeleniumController {
         try {
             // 啟動 WebDriver
             driver = new ChromeDriver(options);
-            
+            //setting google
             driver.get("https://www.google.com.tw");
             
             // 取得網頁標題
