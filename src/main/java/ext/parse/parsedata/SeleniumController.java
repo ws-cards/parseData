@@ -1,11 +1,12 @@
 package ext.parse.parsedata;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import org.openqa.selenium.By;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,29 +42,15 @@ public class SeleniumController {
             // 隨機等待 1 到 3 秒 (1000 ~ 3000 毫秒)，避免遭受阻擋
             long sleepTime = 1000 + (long) (Math.random() * 2000);
             Thread.sleep(sleepTime);
-            
-            // 取得網頁上的牌組資料
-            List<WebElement> cards = driver.findElements(By.cssSelector(".card-item"));
+
+            Document doc = Jsoup.parse(driver.getPageSource());
+            Map<String, Integer> deck = parseDeck(doc);
             Map<String, String> result = new LinkedHashMap<>();
             result.put("deckCode", id);
-            
-            for (WebElement card : cards) {
-                try {
-                    String titleStr = card.findElement(By.cssSelector("img.card-view-item")).getAttribute("title");
-                    String count = card.findElement(By.cssSelector("span.num")).getText();
-                    
-                    // 從 "OSK/S107-003 : “B小町”MEMちょ" 中擷取卡號 "OSK/S107-003"
-                    String cardId = titleStr;
-                    if (titleStr.contains(" : ")) {
-                        cardId = titleStr.split(" : ")[0].trim();
-                    }
-                    
-                    result.put(cardId, count);
-                } catch (Exception ex) {
-                    // 忽略單張卡片解析失敗的情況
-                }
+            for (Map.Entry<String, Integer> e : deck.entrySet()) {
+                result.put(e.getKey(), String.valueOf(e.getValue()));
             }
-            
+
             return result;
 
         } catch (Exception e) {
@@ -76,4 +63,50 @@ public class SeleniumController {
             }
         }
     }
+
+    private static int parseIntSafe(String text) {
+        if (text == null || text.isEmpty()) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(text.trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    private static Map<String, Integer> parseDeck(Document doc) {
+        Map<String, Integer> deck = new LinkedHashMap<>();
+
+        Elements items = doc.select(".card-controller-inner");
+        for (Element item : items) {
+            Elements spans = item.select("span");
+            if (spans.size() < 2) {
+                continue;
+            }
+
+            String title = spans.get(0).attr("title");
+            if (title == null) {
+                title = "";
+            }
+            title = title.trim();
+
+            String[] parts = title.split("\\s*:\\s*", 2);
+            String cardNo = (parts.length > 0 ? parts[0] : "").trim();
+            if (cardNo.isEmpty()) {
+                continue;
+            }
+
+            String qtyText = spans.get(1).text() == null ? "" : spans.get(1).text().trim();
+            int qty = parseIntSafe(qtyText);
+
+            if (qty <= 0) {
+                continue;
+            }
+
+            deck.put(cardNo, deck.getOrDefault(cardNo, 0) + qty);
+        }
+
+        return deck;
+    }    
 }
