@@ -26,7 +26,7 @@ public class SeleniumController {
             //setting google
             driver.get("https://www.google.com.tw");
             
-            // 取得網頁標題
+            // 取得網頁標題 - google
             String title = driver.getTitle();
             
             return "成功抓取網頁標題: " + title;
