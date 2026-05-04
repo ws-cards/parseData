@@ -1,25 +1,23 @@
-# 使用包含 JDK 17 的 Ubuntu 基礎映像檔
-FROM eclipse-temurin:17-jdk-jammy
+# 使用 Debian Bookworm 版本的 JDK，相容性較佳
+FROM eclipse-temurin:17-jdk-bookworm
 
-# 安裝 wget, gnupg2 以及 Google Chrome
+# 安裝 Chromium 瀏覽器、ChromeDriver 與 wget
 RUN apt-get update && \
-    apt-get install -y wget gnupg2 unzip && \
-    wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    apt-get install -y ./google-chrome-stable_current_amd64.deb && \
-    rm google-chrome-stable_current_amd64.deb && \
-    apt-get clean && \
+    apt-get install -y chromium chromium-driver wget && \
     rm -rf /var/lib/apt/lists/*
 
-# 設定工作目錄
 WORKDIR /app
 
-# 將編譯好的 jar 檔複製到容器中 
-# (請確保你已經先執行過 mvn clean package)
-COPY target/*.jar app.jar
+# 下載 Selenium Standalone Server JAR 檔 (包含 Selenium 執行所需的所有類別)
+# 這裡使用 4.18.1 版本作為範例
+RUN wget https://github.com/SeleniumHQ/selenium/releases/download/selenium-4.18.1/selenium-server-4.18.1.jar -O selenium.jar
 
-# Cloud Run 預設使用 8080 port
-ENV PORT=8080
-EXPOSE 8080
+# 複製本地的 Java 檔
+COPY HelloWorld.java .
 
-# 啟動 Spring Boot 應用程式
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# 編譯 Java 檔，並透過 -cp 將 Selenium JAR 加入 Classpath
+RUN javac -cp selenium.jar HelloWorld.java
+
+# 啟動 HTTP Server，執行時同樣需要載入 Selenium JAR
+# 注意：在 Linux 環境中 Classpath 的分隔符號是冒號 ":"，代表載入當前目錄與 selenium.jar
+CMD ["java", "-cp", ".:selenium.jar", "HelloWorld"]
