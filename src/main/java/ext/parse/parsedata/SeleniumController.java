@@ -24,8 +24,8 @@ public class SeleniumController {
             // 啟動 WebDriver
             driver = new ChromeDriver(options);
             
-            // 讓瀏覽器前往目標網址
-            driver.get("https://example.com");
+            // 🌟 改變目標網址：去爬取 Google 台灣首頁
+            driver.get("https://www.google.com.tw");
             
             // 取得網頁標題
             String title = driver.getTitle();
