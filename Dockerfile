@@ -1,5 +1,5 @@
 # 第一階段：使用 Maven 映像檔來編譯（Builder）
-FROM maven:3.9.6-eclipse-temurin-17-jammy AS builder
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
 WORKDIR /app
 # 複製 pom.xml 和原始碼進去
 COPY pom.xml .
