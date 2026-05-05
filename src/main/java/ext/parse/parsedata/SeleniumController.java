@@ -18,7 +18,7 @@ public class SeleniumController {
 
     @GetMapping("/health")
     public String healthCheck() {
-        return "SeleniumController is healthy and running![update date: 2026-5-5 version: 1.0.0]";
+        return "SeleniumController is healthy and running![update date: 2026-5-5 version: 1.0.3]";
     }
 
     @GetMapping("/view/{id}")
@@ -68,7 +68,7 @@ public class SeleniumController {
             for (Map.Entry<String, Integer> e : deck.entrySet()) {
                 result.put(e.getKey(), String.valueOf(e.getValue()));
             }
-            result.put("html:", doc.html());
+
             return result;
 
         } catch (Exception e) {
