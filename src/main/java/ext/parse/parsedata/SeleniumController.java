@@ -18,7 +18,7 @@ public class SeleniumController {
 
     @GetMapping("/health")
     public String healthCheck() {
-        return "SeleniumController is healthy and running![update date: 2026-5-5]";
+        return "SeleniumController is healthy and running![update date: 2026-5-5 version: 1.0.0]";
     }
 
     @GetMapping("/view/{id}")
@@ -42,15 +42,16 @@ public class SeleniumController {
             // 隨機等待 1 到 3 秒 (1000 ~ 3000 毫秒)，避免遭受阻擋
             long sleepTime = 1000 + (long) (Math.random() * 2000);
             Thread.sleep(sleepTime);
-
+            System.out.println("等待了 " + sleepTime + " 毫秒以模擬人類行為");
             Document doc = Jsoup.parse(driver.getPageSource());
+            System.out.println(doc.html());
             Map<String, Integer> deck = parseDeck(doc);
             Map<String, String> result = new LinkedHashMap<>();
             result.put("deckCode", id);
-            for (Map.Entry<String, Integer> e : deck.entrySet()) {
-                result.put(e.getKey(), String.valueOf(e.getValue()));
-            }
-
+            // for (Map.Entry<String, Integer> e : deck.entrySet()) {
+            //     result.put(e.getKey(), String.valueOf(e.getValue()));
+            // }
+            result.put("html:", doc.html());
             return result;
 
         } catch (Exception e) {
@@ -108,5 +109,19 @@ public class SeleniumController {
         }
 
         return deck;
-    }    
+    }
+
+    public static void main(String[] args) {
+        SeleniumController controller = new SeleniumController();
+        // 測試用：可以抽換為實際存在的 deck ID 
+        String testDeckId = "25CWH"; 
+        System.out.println("開始測試爬取 Deck ID: " + testDeckId);
+        
+        Map<String, String> result = controller.scrapeDeck(testDeckId);
+        
+        System.out.println("====== 爬取結果 ======");
+        for (Map.Entry<String, String> entry : result.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+    }
 }
