@@ -22,7 +22,7 @@ public class SeleniumController {
     }
 
     @GetMapping("/view/{id}")
-    public Map<String, String> scrapeDeck(@PathVariable String id) {
+    public Map<String, Object> scrapeDeck(@PathVariable String id) {
         // 設定 Chrome 啟動參數
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new"); // 使用新版 Headless 模式
@@ -63,16 +63,19 @@ public class SeleniumController {
             Document doc = Jsoup.parse(driver.getPageSource());
 
             Map<String, Integer> deck = parseDeck(doc);
-            Map<String, String> result = new LinkedHashMap<>();
+            Map<String, Object> result = new LinkedHashMap<>();
             result.put("deckCode", id);
+            
+            Map<String, String> cardList = new LinkedHashMap<>();
             for (Map.Entry<String, Integer> e : deck.entrySet()) {
-                result.put(e.getKey(), String.valueOf(e.getValue()));
+                cardList.put(e.getKey(), String.valueOf(e.getValue()));
             }
+            result.put("cardList", cardList);
 
             return result;
 
         } catch (Exception e) {
-            Map<String, String> errorResult = new LinkedHashMap<>();
+            Map<String, Object> errorResult = new LinkedHashMap<>();
             errorResult.put("error", "發生錯誤: " + e.getMessage());
             return errorResult;
         } finally {
@@ -134,10 +137,10 @@ public class SeleniumController {
         String testDeckId = "25CWH"; 
         System.out.println("開始測試爬取 Deck ID: " + testDeckId);
         
-        Map<String, String> result = controller.scrapeDeck(testDeckId);
+        Map<String, Object> result = controller.scrapeDeck(testDeckId);
         
         System.out.println("====== 爬取結果 ======");
-        for (Map.Entry<String, String> entry : result.entrySet()) {
+        for (Map.Entry<String, Object> entry : result.entrySet()) {
             System.out.println(entry.getKey() + ": " + entry.getValue());
         }
     }
