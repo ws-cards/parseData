@@ -30,6 +30,22 @@ public class SeleniumController {
         options.addArguments("--disable-dev-shm-usage"); // 解決容器內 shared memory 不足的問題
         options.addArguments("--disable-gpu"); 
         options.addArguments("--window-size=1920,1080");
+        
+        // 加入反爬蟲繞過參數
+        options.addArguments("--disable-blink-features=AutomationControlled");
+        options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+        
+        // 更多更像人類的參數
+        options.addArguments("--lang=zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7"); // 加上語系
+        options.addArguments("--disable-infobars");
+        options.addArguments("--disable-extensions");
+        options.addArguments("--disable-popup-blocking");
+
+        // 移除自動化控制的特徵標籤
+        java.util.List<String> excludeSwitches = new java.util.ArrayList<>();
+        excludeSwitches.add("enable-automation");
+        options.setExperimentalOption("excludeSwitches", excludeSwitches);
+        options.setExperimentalOption("useAutomationExtension", false);
 
         WebDriver driver = null;
         try {
