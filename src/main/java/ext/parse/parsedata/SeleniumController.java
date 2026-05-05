@@ -58,15 +58,16 @@ public class SeleniumController {
             // 隨機等待 1 到 3 秒 (1000 ~ 3000 毫秒)，避免遭受阻擋
             long sleepTime = 1000 + (long) (Math.random() * 2000);
             Thread.sleep(sleepTime);
-            System.out.println("等待了 " + sleepTime + " 毫秒以模擬人類行為");
+            //
+            System.out.println("search cardlist: https://decklog.bushiroad.com/view/"+id);
             Document doc = Jsoup.parse(driver.getPageSource());
-            System.out.println(doc.html());
+
             Map<String, Integer> deck = parseDeck(doc);
             Map<String, String> result = new LinkedHashMap<>();
             result.put("deckCode", id);
-            // for (Map.Entry<String, Integer> e : deck.entrySet()) {
-            //     result.put(e.getKey(), String.valueOf(e.getValue()));
-            // }
+            for (Map.Entry<String, Integer> e : deck.entrySet()) {
+                result.put(e.getKey(), String.valueOf(e.getValue()));
+            }
             result.put("html:", doc.html());
             return result;
 
