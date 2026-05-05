@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin(origins = "https://ws-cards.cloud/")
+@CrossOrigin(origins = "https://ws-cards.cloud")
 public class SeleniumController {
 
     @GetMapping("/health")
     public String healthCheck() {
-        return "SeleniumController is healthy and running![update date: 2026-5-5 version: 1.0.3]";
+        return "SeleniumController is healthy and running![update date: 2026-5-5 version: 1.0.5]";
     }
 
     @GetMapping("/view/{id}")
