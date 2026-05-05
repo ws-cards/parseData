@@ -18,7 +18,7 @@ public class SeleniumController {
 
     @GetMapping("/health")
     public String healthCheck() {
-        return "SeleniumController is healthy and running!";
+        return "SeleniumController is healthy and running![update date: 2026-5-5]";
     }
 
     @GetMapping("/view/{id}")
