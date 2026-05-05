@@ -9,6 +9,11 @@ RUN mvn clean package -DskipTests
 
 # 第二階段：實際運行的輕量級環境
 FROM eclipse-temurin:17-jdk-jammy
+
+# 替換 APT 來源 (切換至台灣 mirror) 以解決 archive.ubuntu.com 連線逾時問題
+RUN sed -i 's/archive.ubuntu.com/tw.archive.ubuntu.com/g' /etc/apt/sources.list && \
+    sed -i 's/security.ubuntu.com/tw.archive.ubuntu.com/g' /etc/apt/sources.list
+
 # 安裝 Chrome 等相依套件...
 RUN apt-get update && \
     apt-get install -y wget gnupg2 unzip && \
